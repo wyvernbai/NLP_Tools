@@ -1,15 +1,24 @@
+####NER tools
+
+---
 Using the maximum likelihood estimates for transitions and emissions, implement the Viterbi algorithm to compute arg_y1...yn max p(x_1...x_n, y_1...y_n)
 
 I improved my model by split rare word into 5 parts. a) all capitalized word, b) all word whose first letter is capitalized, and others is non-capitalized letter. c) all words that contain only capital letters and dots. d) all words that consists only of numerals.
 
+---
+
 Run the program with command:
-  Command: ruby ner.rb ner_train.dat ner_dev.dat
-  Output: prediction file "ner_dev_processed.hmmprediction"
+<pre>
+Command: ruby ner.rb ner_train.dat ner_dev.dat
+Output: prediction file "ner_dev_processed.hmmprediction"
+</pre>
 
 this program will create temp file ner_train_processed.dat(replaced rare words in ner_train.dat) and ner_processed.count(counts file create by count_freq.py based on ner_train_processed.dat).
 
 then, run the eval script:
-  Command: python eval_ne_tagger.py ner_dev.key ner_dev_processed.hmmprediction
+<pre>
+Command: python eval_ne_tagger.py ner_dev.key ner_dev_processed.hmmprediction
+</pre>
 Here is the output:
   Found 6357 NEs. Expected 5931 NEs; Correct: 3579.
 
