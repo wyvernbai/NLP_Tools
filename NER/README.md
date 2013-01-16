@@ -20,6 +20,7 @@ then, run the eval script:
 Command: python eval_ne_tagger.py ner_dev.key ner_dev_processed.hmmprediction
 </pre>
 Here is the output:
+<pre>
   Found 6357 NEs. Expected 5931 NEs; Correct: 3579.
 
             precision  recall    F1-Score
@@ -28,3 +29,4 @@ Here is the output:
      ORG:  0.484429 0.313901  0.380952
      LOC:  0.804658 0.583969  0.676777
      MISC:   0.720779 0.482085  0.577749
+</pre>
