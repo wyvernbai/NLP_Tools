@@ -2,19 +2,21 @@
 
 Recall that IBM model 1 only has word translation parameters t(f|e), which can be interpreted as the conditional probability of generating a foreign word f from an English word e (or from NULL). Estimate t(f |e) using the *EM algorithm* in this program.
 
-* ibmmodel1_test.rb is a IBM model1 test programe. It has two function:
-	* For each English word e in devwords.txt, print the list of the foreign words with the highest t(f |e) parameter (and the parameter itself)
-	* use the model to find alignments for the sentence pairs in the training data
+ibmmodel1_test.rb is a IBM model1 test programe. It has two function:
+
+* For each English word e in devwords.txt, print the list of the foreign words with the highest t(f |e) parameter (and the parameter itself)
+* use the model to find alignments for the sentence pairs in the training data
 	
 	
-	To run IBM model1 test:
+To run IBM model1 test:
 	<pre>
 ruby ibmmode1_test.rb corpus.en corpus.de devwords.txt 10 5 20</pre>
-	* 10 means 10 foreign words with the highest t(f |e) parameter.
-  	* 5 means running 5 iterations of the EM algorithm.
-  	* 20 means using ibm model 1 to find alignments for the first 20 sentence pairs in the training data.
+
+* 10 means 10 foreign words with the highest t(f |e) parameter.
+* 5 means running 5 iterations of the EM algorithm.
+* 20 means using ibm model 1 to find alignments for the first 20 sentence pairs in the training data.
   	
-  	Here is the output:
+ Here is the output:
 	<pre>
 i
 [["ich", 0.42717946287809744], [",", 0.1009515320848458], [".", 0.062317827436341094], ["da&szlig;", 0.032094589328632815], ["m&ouml;chte", 0.029105372852299135], ["habe", 0.0212210942784231], ["die", 0.020146165002278903], ["der", 0.015215242997828487], ["und", 0.012377873760526813], ["zu", 0.012265739348434756]]
@@ -27,7 +29,7 @@ keys
 ...
 </pre>
 	
-	<pre>
+<pre>
 resumption of the session
 wiederaufnahme der sitzungsperiode 
 [0, 1, 3]
