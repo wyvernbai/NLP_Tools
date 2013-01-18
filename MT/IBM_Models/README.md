@@ -46,8 +46,8 @@ Similar to IBM model1. To run IBM model1 test:
 <pre>ruby ibmmodel2_test.rb corpus.en corpus.de 5 20
 Output: stdout & a ibm model2 file called "ibmmodel2.model"</pre>
 
-  * 5 means running 5 iterations of the EM algorithm.
-  * 20 means using ibm model2 to find alignments for the first 20 sentence pairs in the training data.
+* 5 means running 5 iterations of the EM algorithm.
+* 20 means using ibm model2 to find alignments for the first 20 sentence pairs in the training data.
 
 Here is the result:
 <pre>
