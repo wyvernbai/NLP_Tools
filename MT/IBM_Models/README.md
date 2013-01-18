@@ -17,7 +17,7 @@ ruby ibmmode1_test.rb corpus.en corpus.de devwords.txt 10 5 20</pre>
 * 20 means using ibm model 1 to find alignments for the first 20 sentence pairs in the training data.
   	
  Here is the output:
-	<pre>
+<pre>
 i
 [["ich", 0.42717946287809744], [",", 0.1009515320848458], [".", 0.062317827436341094], ["da&szlig;", 0.032094589328632815], ["m&ouml;chte", 0.029105372852299135], ["habe", 0.0212210942784231], ["die", 0.020146165002278903], ["der", 0.015215242997828487], ["und", 0.012377873760526813], ["zu", 0.012265739348434756]]
 dog
