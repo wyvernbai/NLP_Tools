@@ -21,12 +21,12 @@ Command: python eval_ne_tagger.py ner_dev.key ner_dev_processed.hmmprediction
 </pre>
 Here is the output:
 <pre>
-  Found 6357 NEs. Expected 5931 NEs; Correct: 3579.
+  Found 5909 NEs. Expected 5931 NEs; Correct: 4021.
 
-            precision  recall    F1-Score
-     Total:  0.563001 0.603440  0.582520
-     PER:  0.464014 0.894450  0.611039
-     ORG:  0.484429 0.313901  0.380952
-     LOC:  0.804658 0.583969  0.676777
-     MISC:   0.720779 0.482085  0.577749
+             precision  recall    F1-Score
+     Total:  0.680487 0.677963  0.679223
+     PER:  0.745192 0.758977  0.752022
+     ORG:  0.447526 0.615097  0.518099
+     LOC:  0.823378 0.699019  0.756119
+     MISC:   0.812793 0.565689  0.667093
 </pre>

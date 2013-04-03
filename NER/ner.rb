@@ -7,14 +7,22 @@
 require "./hmmlib.rb"
 
 # replace rare word for different class
-def word_replace word
+def word_replace word, first_word
   if word =~ /^[A-Z]*$/ then
    "_PROPER_"#proper names
-  elsif word =~ /^[A-Z][a-z]*$/ then
-    "_NAME_"
   elsif word =~ /^[A-Z|\.]*$/ then
-    "_FNOCO_" #first name or companies
-  elsif word =~ /^[0-9]*$/ then
+    if first_word then
+      "_FIRST_"
+    else
+      "_FNOCO_" #first name or companies
+    end
+  elsif word =~ /^[A-Z].+$/ then
+    if first_word then
+      "_FIRST_NAME_"
+    else
+      "_NAME_"
+    end
+  elsif word =~ /^[0-9|\-]*$/ then
     "_NUM_" #number
   else
     "_RARE_"
@@ -34,10 +42,10 @@ def getTrigramProb count_y_y, count_y_y_y, yip0, yip1, yip2
   count_y210.to_f / count_y21
 end
 
-def getEmission word, tag, count_y_x, count_y, count_x, word_frequence
+def getEmission word, tag, count_y_x, count_y, count_x, word_frequence, first_word
   t_w = "#{tag} #{word}"
   if word_frequence[word] < 5 || !count_x.has_key?(word) then
-    t_w = "#{tag} #{word_replace(word)}"
+    t_w = "#{tag} #{word_replace(word, first_word)}"
   end
   count_w_t = count_y_x.has_key?(t_w) ? count_y_x[t_w] : 0
   count_t = count_y[tag]
@@ -63,16 +71,19 @@ File.read(INPUTFILE).each_line do |line|
 end
 
 # replace rare word with special word
+first_word = true
 File.open("ner_train_processed.dat", "w:utf-8") do |write_stream|
   file_line.each do |item|
     if item[0] == "\n" then
       write_stream.write "\n"
+      first_word = true
     else
       if word_frequence[item[0]] >= 5 then
         write_stream.write "#{item[0]} #{item[1]}"
       else
-        write_stream.write "#{word_replace item[0]} #{item[1]}"
+        write_stream.write "#{word_replace item[0], first_word} #{item[1]}"
       end
+      first_word = false
     end
   end
 end
@@ -86,37 +97,63 @@ OUTPUT_FILE = ARGV[2] ? ARGV[2] : "ner_dev_processed.hmmprediction"
 
 count_x, count_y, count_y_x, count_y_y, count_y_y_y = loadmodel MODEL_FILE
 word_frequence = wordcount TEST_FILE
+observ = {}
 
 File.open(OUTPUT_FILE, "w:utf-8") do |write_stream|
   File.read(TEST_FILE).split(/^$\n/).each do |setence|
+    pre_statuses = {["*", "*"] => [0, ["*", "*"], [0, 0]]}
     word_setence = setence.split(/\n/)
-    predict_tagger = []
     word_setence.each_with_index do |word, index|
-      if index - 2 < 0 then
-        yip2 = "*"
-      else
-        yip2 = predict_tagger[index - 2][0]
-      end
+      first_word = false
+      first_word = true if index == 0
+      new_statuses = {}
+      pre_statuses.each do |y12, prob2|
 
-      if index - 1 < 0 then
-        yip1 = "*"
-      else
-        yip1 = predict_tagger[index - 1][0]
-      end
+        count_y.each_key do |possible_ner|
+          status = [y12[1], possible_ner]
 
-      possible_tagger = {}
-      count_y.each_key do |possible_tag|
-        e = getEmission word, possible_tag, count_y_x, count_y, count_x, word_frequence
-        pi = getTrigramProb count_y_y, count_y_y_y, possible_tag, yip1, yip2
-        next if pi == nil || pi == 0
-        if index == 0 then
-          possible_tagger.store possible_tag, e * pi
-        else
-          possible_tagger.store possible_tag, predict_tagger[index - 1][1] * e * pi
+          e = getEmission word, possible_ner, count_y_x, count_y, count_x, word_frequence, first_word
+          pi = getTrigramProb count_y_y, count_y_y_y, possible_ner, y12[1], y12[0]
+          next if pi == nil || pi == 0 || e == 0
+          
+          prob_newstatus = prob2[0] + Math.log(e) + Math.log(pi)
+          
+          if new_statuses.has_key? status
+            if new_statuses[status][0] < prob_newstatus
+              new_statuses[status][0] = prob_newstatus
+              (new_statuses[status][1] = Array.new(prob2[1])) << possible_ner
+              (new_statuses[status][2] = Array.new(prob2[2])) << prob_newstatus
+            end
+          else
+            status_prob = Array.new(prob2[1])
+            status_prob_list = Array.new(prob2[2])
+            new_statuses[status] = [prob_newstatus, status_prob << possible_ner, status_prob_list << prob_newstatus]
+          end
         end
       end
-      predict_tagger << possible_tagger.max_by {|k,v| v}
-      write_stream.write "#{word} #{predict_tagger[index][0]} #{Math.log(predict_tagger[index][1]).to_s}\n"
+      pre_statuses = new_statuses
+    end
+
+    ner_result = []
+    ner_result_prob = []
+    ner_prob_max = -Float::MAX
+    pre_statuses.each do |y12, prob2|
+
+      pi = getTrigramProb count_y_y, count_y_y_y, "STOP", y12[1], y12[0]
+      next if pi == nil || pi == 0
+
+      cur_prob = prob2[0] + Math.log(pi)
+
+      if cur_prob  > ner_prob_max
+        ner_result = prob2[1]
+        ner_result_prob = prob2[2]
+        ner_prob_max = cur_prob
+      end
+
+    end
+
+    word_setence.each_with_index do |word, index|
+      write_stream.write "#{word} #{ner_result[index + 2]} #{ner_result_prob[index + 2].to_s}\n"
     end
     write_stream.write "\n"
   end
