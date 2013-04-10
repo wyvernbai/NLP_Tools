@@ -44,7 +44,7 @@ end
 
 def getEmission word, tag, count_y_x, count_y, count_x, word_frequence, first_word
   t_w = "#{tag} #{word}"
-  if word_frequence[word] < 5 || !count_x.has_key?(word) then
+  if !count_x.has_key?(word) then
     t_w = "#{tag} #{word_replace(word, first_word)}"
   end
   count_w_t = count_y_x.has_key?(t_w) ? count_y_x[t_w] : 0
